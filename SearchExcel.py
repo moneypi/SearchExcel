@@ -89,17 +89,19 @@ class App(QWidget):
         for file_name in file_list:
             if file_name.endswith("xlsx") or file_name.endswith("xls"):
                 excel_file_path = os.path.join(excel_dir_path, file_name)
-                excel = xlrd.open_workbook(excel_file_path, encoding_override="utf-8")
-                if excel is None:
-                    continue
-                all_sheet = excel.sheet_names()
-                for sheet_name in all_sheet:
-                    each_sheet_by_name = excel.sheet_by_name(sheet_name)
-                    for i in range(each_sheet_by_name.nrows):
-                        for j in range(each_sheet_by_name.ncols):
-                            if searchText in str(each_sheet_by_name.row_values(i)[j]):
-                                result_list.append(
-                                    (file_name, sheet_name, i + 1, j + 1, each_sheet_by_name.row_values(i)[j]))
+                try:
+                    excel = xlrd.open_workbook(excel_file_path, encoding_override="utf-8")
+                except IOError:
+                    print("open %s failed" % excel_file_path)
+                else:
+                    all_sheet = excel.sheet_names()
+                    for sheet_name in all_sheet:
+                        each_sheet_by_name = excel.sheet_by_name(sheet_name)
+                        for i in range(each_sheet_by_name.nrows):
+                            for j in range(each_sheet_by_name.ncols):
+                                if searchText in str(each_sheet_by_name.row_values(i)[j]):
+                                    result_list.append(
+                                        (file_name, sheet_name, i + 1, j + 1, each_sheet_by_name.row_values(i)[j]))
 
         self.tableWidget.setRowCount(len(result_list))
 
